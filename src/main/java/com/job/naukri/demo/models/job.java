@@ -8,17 +8,29 @@ import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 
 @Entity
 public class job {
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
 
 	public job() {
 		super();
@@ -48,11 +60,11 @@ public class job {
 		this.company = company;
 	}
 
-	public Long getSalary() {
+	public String getSalary() {
 		return salary;
 	}
 
-	public void setSalary(Long salary) {
+	public void setSalary(String salary) {
 		salary = salary;
 	}
 
@@ -80,11 +92,11 @@ public class job {
 		this.expiry = expiry;
 	}
 
-	public List<String> getSkills() {
+	public String getSkills() {
 		return skills;
 	}
 
-	public void setSkills(List<String> skills) {
+	public void setSkills(String skills) {
 		this.skills = skills;
 	}
 
@@ -96,7 +108,7 @@ public class job {
     
     private String company;
     
-    private Long salary;
+    private String salary;
     
     private String description;
     
@@ -104,11 +116,12 @@ public class job {
     
     private Date expiry;
     
-    @ElementCollection
-    private List<String> skills;
+   private String skills;
+   
+   private String location;
     
-    public job(int id, String role, String company, Long salary, String description, String level, Date expiry,
-			List<String> skills, List<user> candidates) {
+    public job(int id, String role, String company, String salary, String description, String level, Date expiry,
+			String skills, List<user> candidates,String location) {
 		super();
 		this.id = id;
 		this.role = role;
@@ -119,9 +132,10 @@ public class job {
 		this.expiry = expiry;
 		this.skills = skills;
 		this.candidates = candidates;
+		this.location=location;
 	}
-
-	@OneToMany(targetEntity=user.class,cascade=CascadeType.ALL)
+	@ManyToMany(targetEntity=user.class,cascade=CascadeType.ALL,fetch=FetchType.LAZY)
+	@JsonIgnore
     private List<user> candidates;
     
 	public List<user> getCandidates() {

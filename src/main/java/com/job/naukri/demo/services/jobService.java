@@ -33,12 +33,24 @@ public class jobService {
 	public String applyToJob(Integer userId,Integer jobId)
 	{
 		job jobToApply= jobRepo.getOne(jobId);
+		user applier=userRepo.getById(userId);
+		List<job> jobs=applier.getApplied();
+		jobs.add(jobToApply);
+		applier.setApplied(jobs);
+		userRepo.save(applier);
 		List<user> candidates=jobToApply.getCandidates();
+		System.out.println(candidates);
 		candidates.add(userRepo.getOne(userId));
+		System.out.println(candidates);
 		jobToApply.setCandidates(candidates);
 		jobRepo.save(jobToApply);
 		return "Job Apply Success";
 		
+	}
+	
+	public List<job> getCandidateJobs(Integer userId)
+	{
+		return userRepo.getById(userId).getApplied();
 	}
 
 }

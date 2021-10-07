@@ -82,7 +82,7 @@ public class userService {
 		return responseMap;
 	}
 	
-	public String loginUser(user u) throws NoSuchAlgorithmException
+	public user loginUser(user u) throws NoSuchAlgorithmException
 	{
 		String password=toHexString(getSHA(u.getPassword()));
 		user toSave = new user(u.getUsername(), password, u.getRole(),u.getApplied(), u.getF());
@@ -94,9 +94,9 @@ public class userService {
 		{
 			System.out.println(uu.getUsername()+"   "+toSave.getUsername());
 			if(uu.getUsername().equals(toSave.getUsername()))
-				return "login success";
+				return uu;
 		}
-		return "login failed";
+		return new user();
 	}
 	
 	
@@ -116,6 +116,16 @@ public class userService {
 		user foundUser=userRepo.getById(id);
 		return foundUser.getF();
 		
+	}
+	
+	public List<user> fetchUsers()
+	{
+		return userRepo.findAll();
+	}
+	
+	public List<job> fetchApplied(Integer userId)
+	{
+		return userRepo.getById(userId).getApplied();
 	}
 	
 	public uploadFileResponse uploadResume(MultipartFile file,Integer id) throws IOException

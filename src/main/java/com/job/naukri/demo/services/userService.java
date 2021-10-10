@@ -1,8 +1,5 @@
 package com.job.naukri.demo.services;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -18,6 +15,7 @@ import org.springframework.boot.autoconfigure.batch.BatchProperties.Job;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -64,12 +62,15 @@ public class userService {
 	@Autowired
 	private userRepository userRepo;
 	
+	@Autowired
+	private jobRepository jobRepo;
+	
 	
 	public Map<String, Object> registerUser(user u) throws NoSuchAlgorithmException
 	{
 		Map<String, Object> responseMap=new HashMap<String, Object>();
 		String password=toHexString(getSHA(u.getPassword()));
-		user toSave = new user(u.getUsername(), password, u.getRole(),u.getApplied(), u.getF());
+		user toSave = new user(u.getUsername(), password, u.getRole(),u.getApplied(), u.getResume(), null);
 		List<user> toFind = userRepo.findAll();
 		for(user uu:toFind)
 			if(u.getUsername()==toSave.getUsername())
@@ -85,7 +86,7 @@ public class userService {
 	public user loginUser(user u) throws NoSuchAlgorithmException
 	{
 		String password=toHexString(getSHA(u.getPassword()));
-		user toSave = new user(u.getUsername(), password, u.getRole(),u.getApplied(), u.getF());
+		user toSave = new user(u.getUsername(), password, u.getRole(),u.getApplied(), u.getResume(), null);
 		System.out.println(toSave);
 		List<user> toFind = userRepo.findAll();
 		for(user ue:toFind)
@@ -111,11 +112,18 @@ public class userService {
 		return userRepo.findById(id);
 	}
    
-	public file getResume(Integer id)
+	public String uploadResume(Map<String, String> body)
 	{
-		user foundUser=userRepo.getById(id);
-		return foundUser.getF();
-		
+		user toUpload=userRepo.getById(Integer.parseInt(body.get("userId")));
+		toUpload.setResume(body.get("resume"));
+		userRepo.save(toUpload);
+		return "Resume Uploaded";
+	}
+	
+	public String getResume(String userId)
+	{
+		user toFind=userRepo.getById(Integer.parseInt(userId));
+		return toFind.getResume();
 	}
 	
 	public List<user> fetchUsers()
@@ -135,23 +143,23 @@ public class userService {
 		userRepo.save(toUpdate);
 		return "Update Success";
 	}
-	
-	public uploadFileResponse uploadResume(MultipartFile file,Integer id) throws IOException
-	{
-		user toFind=userRepo.getOne(id);
-		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-		file toUpload=new file(fileName,file.getContentType(),file.getBytes());
-		toFind.setF(toUpload);
-		user uploaded=userRepo.save(toFind);
-		 String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-	                .path("C:/Users/REESU/Documents/resumes/")
-	                .path(uploaded.getF().getId())
-	                .toUriString();
 
-	        return new uploadFileResponse(uploaded.getF().getFileName(), fileDownloadUri,
-	                uploaded.getF().getFileType(), file.getSize());
-//		
-//		 return new ByteArrayResource(uploaded.getF().getData());
+	public String blockJob(Map<String, String> body)
+	{
+		user blocker=userRepo.getById(Integer.parseInt(body.get("userId")));
+		job toBlock=jobRepo.getById(Integer.parseInt(body.get("jobId")));
+		List<job> blockedJobs=blocker.getBlocked();
+		blockedJobs.add(toBlock);
+		blocker.setBlocked(blockedJobs);
+		userRepo.save(blocker);
+		return "Job Blocked Successfully";
 	}
+	
+	public List<job> getBlockedJobs(String userId)
+	{
+		return userRepo.getById(Integer.parseInt(userId)).getBlocked();
+	}
+	
+	
 
 }

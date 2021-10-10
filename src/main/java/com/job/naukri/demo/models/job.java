@@ -119,6 +119,7 @@ public class job {
    private String skills;
    
    private String location;
+   
     
     public job(int id, String role, String company, String salary, String description, String level, Date expiry,
 			String skills, List<user> candidates,String location) {

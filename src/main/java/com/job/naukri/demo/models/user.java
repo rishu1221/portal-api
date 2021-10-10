@@ -58,7 +58,7 @@ public class user {
 	
 	@Override
 	public String toString() {
-		return "user [id=" + id + ", username=" + username + ", password=" + password + ", role=" + role + ", f=" + f
+		return "user [id=" + id + ", username=" + username + ", password=" + password + ", role=" + role + ", resume=" + resume
 				+ ", applied=" + applied + "]";
 	}
 
@@ -67,19 +67,22 @@ public class user {
 	private String password;
 	
 	private String role;
-	@ManyToOne(cascade=CascadeType.ALL)
-	private file f;
+	private String resume;
 	
-	public file getF() {
-		return f;
+	public String getResume() {
+		return resume;
 	}
 
-	public void setF(file f) {
-		this.f = f;
+	public void setResume(String f) {
+		this.resume = f;
 	}
 	@ManyToMany(targetEntity=job.class,cascade=CascadeType.ALL,fetch=FetchType.LAZY)
 	@JsonIgnore
 	private List<job> applied;
+	
+	@ManyToMany(targetEntity=job.class,cascade=CascadeType.ALL,fetch=FetchType.LAZY)
+	@JsonIgnore
+	private List<job> blocked;
 	
 	
 
@@ -87,13 +90,14 @@ public class user {
 		super();
 	}
 
-	public user(String username, String password, String role, List<job> applied,file f) {
+	public user(String username, String password, String role, List<job> applied,String f,List<job> blocked) {
 		super();
 		this.username = username;
 		this.password = password;
 		this.role = role;
 		this.applied = applied;
-		this.f=f;
+		this.resume=f;
+		this.blocked=blocked;
 	}
 
 	public List<job> getApplied() {
@@ -102,6 +106,14 @@ public class user {
 
 	public void setApplied(List<job> applied) {
 		this.applied = applied;
+	}
+
+	public List<job> getBlocked() {
+		return blocked;
+	}
+
+	public void setBlocked(List<job> blocked) {
+		this.blocked = blocked;
 	}
 	
 }

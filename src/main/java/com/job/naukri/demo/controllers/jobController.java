@@ -30,10 +30,10 @@ public class jobController {
 	{
 		return service.postJob(j);
 	}
-	@GetMapping("/getjobs")
-	public List<job> getJobs()
+	@GetMapping("/getjobs/{userId}")
+	public List<job> getJobs(@PathVariable String userId)
 	{
-		return service.getJobs();
+		return service.getJobs(userId);
 		
 		
 	}

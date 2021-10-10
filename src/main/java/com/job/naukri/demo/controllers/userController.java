@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.job.naukri.demo.models.job;
 import com.job.naukri.demo.models.uploadFileResponse;
 import com.job.naukri.demo.models.user;
+import com.job.naukri.demo.repository.jobRepository;
 import com.job.naukri.demo.services.jobService;
 import com.job.naukri.demo.services.userService;
 @CrossOrigin("http://localhost:3000")
@@ -30,7 +31,8 @@ public class userController {
 	
 	@Autowired
 	private userService service;
-	
+	@Autowired 
+	private jobRepository jobRepo;
 	@Autowired
 	private jobService jobservice;
 	
@@ -52,9 +54,14 @@ public class userController {
 	}
 	
 	@PostMapping("/uploadresume")
-	public uploadFileResponse uploadResume(@RequestParam("file") MultipartFile file,Integer id) throws IOException
+	public String uploadResume(@RequestBody Map<String, String> body) throws IOException
 	{
-		return service.uploadResume(file,id );
+		return service.uploadResume(body);
+	}
+	@GetMapping("/getResume")
+	public String getResume(@PathVariable String userId)
+	{
+		return service.getResume(userId);
 	}
 	
 	@PostMapping("/apply")
@@ -80,6 +87,34 @@ public class userController {
 	{
 		return service.updatePassword(body);
 	}
+	@GetMapping("/job/search/{tag}/{search}")
+	public List<job> getSearch(@PathVariable String tag,@PathVariable String search)
+	{
+		if(tag.contentEquals("company")) {
+			return jobRepo.findByCompanyContaining(search);
+		}
+		else if(tag.contentEquals("skills"))
+		{
+			return jobRepo.findBySkillsContaining(search);
+		}
+		
+			return jobRepo.findByRoleContaining(search);
+		
+	}
+	
+	@PostMapping("/blockjob")
+	public String blockJob(@RequestBody Map<String, String> body)
+	{
+		return service.blockJob(body);
+	}
+	
+	@GetMapping("/getBlocked/{userId}")
+	public List<job> getBlockedJobs(@PathVariable String userId)
+	{
+		return service.getBlockedJobs(userId);
+	}
+	
+	
 	
 	
 

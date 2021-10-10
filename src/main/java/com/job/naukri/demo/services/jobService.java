@@ -20,9 +20,13 @@ public class jobService {
 	private userRepository userRepo;
 	
 	
-	public List<job> getJobs()
+	public List<job> getJobs(String userId)
 	{
-		return jobRepo.findAll();
+		List<job> jobs= jobRepo.findAll();
+		List<job> blockedJobs=userRepo.getById(Integer.parseInt(userId)).getBlocked();
+		jobs.removeAll(blockedJobs);
+		return jobs;
+		
 	}
 	
 	public job postJob(job j)

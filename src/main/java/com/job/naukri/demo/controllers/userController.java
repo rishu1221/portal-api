@@ -75,6 +75,12 @@ public class userController {
 		return service.getAppliedJobs(Integer.parseInt(userId));
 	}
 	
+	@PostMapping("/updatepass")
+	public String updatePassword(@RequestBody Map<String,String> body) throws NoSuchAlgorithmException
+	{
+		return service.updatePassword(body);
+	}
+	
 	
 
 }

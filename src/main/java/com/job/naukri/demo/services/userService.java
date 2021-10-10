@@ -93,7 +93,7 @@ public class userService {
 		for(user uu:toFind)
 		{
 			System.out.println(uu.getUsername()+"   "+toSave.getUsername());
-			if(uu.getUsername().equals(toSave.getUsername()))
+			if(uu.getUsername().equals(toSave.getUsername())&&uu.getPassword().equals(toSave.getPassword()))
 				return uu;
 		}
 		return new user();
@@ -126,6 +126,14 @@ public class userService {
 	public List<job> fetchApplied(Integer userId)
 	{
 		return userRepo.getById(userId).getApplied();
+	}
+	
+	public String updatePassword(Map<String, String> body) throws NoSuchAlgorithmException
+	{
+		user toUpdate=userRepo.getById(Integer.parseInt(body.get("userId")));
+		toUpdate.setPassword(toHexString(getSHA(body.get("password"))));
+		userRepo.save(toUpdate);
+		return "Update Success";
 	}
 	
 	public uploadFileResponse uploadResume(MultipartFile file,Integer id) throws IOException
